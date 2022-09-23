@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% block title %}{{ data }} {% endblock %}
+{% block content %}
+<div class="container" style="width:100%;">
+
+  <nav class="navbar">
+    <div class="navbar-header">
+      
+    <span class="navbar-brand">{{ config.APPNAME }}</span>
+    </div>
+    <form class="navbar-form navbar-left" role="search" name="goto" action="/goto" method="POST">
+      <div class="form-group">
+        <input type="text" name="index" class="form-control" placeholder="Go to index">
+      </div>
+      <button type="Go" class="btn btn-default">Go</button>
+    </form>
+    <ul class="nav navbar-nav">
+      <li><a href="/">home</a></li>
+      <li><div class="auto" onclick="location.href='/{{pager.prev}}';" id=",">prev</div></li>
+      <li><div class='auto' id="d">dump</div></li>
+      <li><div class="auto" onclick="location.href='/{{pager.next}}';" id=".">next</div></li>
+    </ul>
+  </nav>
+
+  <div class="name">
+    <h2>{{ data }}<h2>
+  </div>
+  <div class="images-crop">
+    <img src="{{ url_for('static', filename='Eye/eye_glasses/vis/'+ data) }}" class="images" alt="">
+  </div>
+</div>
+
+<style>
+  .auto {
+    font-size: 1.5rem;
+    text-align: center;
+    color: #428bca;
+    padding: 1.5rem;
+    transition: all .5s ease;
+  }
+  
+  .pressed {
+    background: #245269;
+    transform: scale(1);
+  }
+
+  .images-crop {
+    position: relative;
+    width: {{index[2]}}px;
+    height: {{index[3]}}px;
+    overflow: hidden;
+    transform: translate(800px, 400px) scale(6);
+  }
+  .images {
+    position: absolute;
+    top: -{{index[1]}}px;
+    left: -{{index[0]}}px;
+    width: 1280px;
+    height: 720px;
+    
+  }
+
+</style>
+
+<script>
+  window.addEventListener("keydown", e => {
+    const key = document.getElementById(e.key);
+    if (key) key.classList.add('pressed');
+  });
+  
+  
+  window.addEventListener("keyup", e => {
+    const key = document.getElementById(e.key);
+    if (e.key==',') location.href='/{{pager.prev}}';
+    else if (e.key=='.') location.href='/{{pager.next}}';
+    else if (e.key=='d'){
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: '/test',
+        data: JSON.stringify(["{{ data }}", "{{ pager.current }}"]),
+        dataType: 'text',
+        /* success: function(response){
+          alert(response)
+        }, */
+        error : function(xtr, status, error){
+          alert(xtr +":"+status+":"+error);
+        }
+      });
+    };
+    if (key) key.classList.remove('pressed');
+  });
+</script>
+
+{% endblock %}
